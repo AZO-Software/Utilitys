@@ -46,6 +46,7 @@
     <Compile Include="ControlUtilitys\ManagerExceptions.cs" />
     <Compile Include="ControlUtilitys\PrintReport.cs" />
     <Compile Include="ControlUtilitys\Validate.cs" />
+    <Compile Include="ManagerSQLServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

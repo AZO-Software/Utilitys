@@ -8,25 +8,32 @@ using System.Data;
 
 namespace AZO_Library
 {
-    public abstract class ManagerSQLServer
+    public class ManagerSQLServer
     {
-        private static SqlConnection connection = new SqlConnection();
-        private static SqlCommand command;
-        private static SqlDataAdapter adapter;
+        private SqlConnection connection = new SqlConnection();
+        private SqlCommand command;
+        private SqlDataAdapter adapter;
+        private SqlTransaction transaction;
+        private bool beginTransaction;
 
         //stringConexion = System.Configuration.ConfigurationManager.ConnectionStrings["sqlServer"].ConnectionString;
-        //connection.ConnectionString = stringConexion;
 
-        public sealed bool AddStoredProcedure(String storedProcedure)
+        protected void SetConnectionString(String strConnection)
+        {
+            this.connection.ConnectionString = strConnection;
+
+            command = new SqlCommand();
+            command.Connection = connection;
+        }
+
+        protected bool AddStoredProcedure(String storedProcedure)
         {
             try
             {
-                if (connection.State.ToString().Equals("Open"))
+                if (connection.State == ConnectionState.Open)
                     connection.Close();
                 connection.Open();
 
-                command = new SqlCommand();
-                command.Connection = connection;
                 command.CommandType = System.Data.CommandType.StoredProcedure;
                 command.CommandText = storedProcedure;
                 return true;
@@ -37,12 +44,58 @@ namespace AZO_Library
             }
         }
 
-        public sealed void AddParameter(String parameter, Object value)
+        protected void AddParameter(String parameter, Object value)
         {
             command.Parameters.AddWithValue(parameter, value);
         }
 
-        private DataTable GetTable()
+        protected int ExecuteQuery(bool beginTransaction)
+        {
+            try
+            {
+                this.beginTransaction = beginTransaction;
+                if(beginTransaction)
+                {
+                    BeginTransaction();
+                }
+
+                return command.ExecuteNonQuery();
+            }
+            catch(Exception)
+            {
+                if(beginTransaction)
+                {
+                    beginTransaction = false;
+                    transaction.Rollback();
+                }
+                return -1;
+            }
+        }
+
+        protected SqlDataReader GetReader(bool beginTransaction)
+        {
+            try
+            {
+                this.beginTransaction = beginTransaction;
+                if (beginTransaction)
+                {
+                    BeginTransaction();
+                }
+
+                return command.ExecuteReader();
+            }
+            catch (Exception)
+            {
+                if (beginTransaction)
+                {
+                    beginTransaction = false;
+                    transaction.Rollback();
+                }
+                return null;
+            }
+        }
+
+        protected DataTable GetTable()
         {
             try
             {
@@ -56,6 +109,74 @@ namespace AZO_Library
                 return null;
             }
         }
+
+        protected DataTable GetTable(byte tableNumber)
+        {
+            try
+            {
+                DataSet ds = new DataSet();
+                adapter = new SqlDataAdapter(command);
+                adapter.Fill(ds, "VALSEC");
+                return ds.Tables[tableNumber];
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public void BeginTransaction()
+        {
+            try
+            {
+                transaction = connection.BeginTransaction();
+                command.Transaction = transaction;
+                beginTransaction = true;
+            }
+            catch (Exception)
+            {
+                command.Transaction = null;
+                beginTransaction = false;
+            }
+        }
+
+        public void EndTransaction()
+        {
+            try
+            {
+                transaction.Commit();
+                beginTransaction = false;
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                beginTransaction = false;
+            }
+        }
+
+        //public Dictionary<string, string> ExecuteQuery()
+        //{
+        //    try
+        //    {
+        //        return GenDictionary(command.ExecuteReader());
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
+
+        //public DataTable ExecuteQuery()
+        //{
+        //    try
+        //    {
+        //        return GetTable();
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
 
         private Dictionary<string, string> GenDictionary(SqlDataReader reader)
         {
