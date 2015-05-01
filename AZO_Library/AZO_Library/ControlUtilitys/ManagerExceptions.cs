@@ -9,7 +9,7 @@ namespace AZO_Library.ControlUtilitys
     public class ManagerExceptions //: IObservable<ManagerExceptions>
     {
 
-        private const string LOG_FILE = "CyberAdministratorLog.txt";
+        private const string LOG_FILE = "LogsFile.txt";
 
         #region Write to File Log
 
