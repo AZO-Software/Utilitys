@@ -11,18 +11,24 @@ namespace AZO_Library.ControlUtilitys
 {
     public class DataGridConfiguration
     {
-        private static ArrayList dataGridConfiguration;
-        private static string dataGridConfigurationPath;
-        public static string[] grdsName = { "grdInvoices", "grdItems", "grdAllItems", "grdItemsInfo" };
+        private static ArrayList configurations;
+        private static string dataGridConfigurationPath = "Configuration.txt";
+        public static ArrayList grdsName;
 
-        public static void setGridConfiguration(DataGridView dataGrd)
+        /// <summary>
+        /// Guarda el tamaño de las columnas de un grid en un archivo interno
+        /// </summary>
+        /// <param name="dataGrd"></param>
+        public static void SaveConfiguration(DataGridView dataGrd)
         {
             try
             {
-                if (File.Exists(dataGridConfigurationPath) && dataGrd.RowCount > 0)
+                if (File.Exists(dataGridConfigurationPath) && dataGrd.ColumnCount > 0)
                 {
-                    String cadena = "";
+                    //ingreso el nombre del grid al inicio de la cadena de configuracion
+                    String cadena = dataGrd.Name + ";";
 
+                    //ingreso el tamaño de c/u de las columnas del grid
                     for (int i = 0; i < dataGrd.ColumnCount - 1; i++)
                     {
                         cadena += dataGrd.Columns[i].Width.ToString() + ",";
@@ -30,24 +36,32 @@ namespace AZO_Library.ControlUtilitys
                     cadena += dataGrd.Columns[dataGrd.ColumnCount - 1].Width.ToString();
 
                     StreamWriter writer = new StreamWriter(dataGridConfigurationPath);
-                    for (int i = 0; i < grdsName.Length; i++)
+                    for (int i = 0; i < grdsName.Count; i++)
                     {
-                        if (dataGridConfiguration.Count < grdsName.Length)//este es para cuando se reinicio/borro el archivo
-                            dataGridConfiguration.Add(cadena);
+                        if (configurations.Count < grdsName.Count)//este es para cuando se reinicio/borro el archivo
+                        {
+                            configurations.Add(cadena);
+                        }
                         else if (dataGrd.Name.Equals(grdsName[i]))
-                            dataGridConfiguration[i] = cadena;//cada uno de estos representa un DataGridView
-                        writer.WriteLine(dataGridConfiguration[i]);
+                        {
+                            configurations[i] = cadena;//cada uno de estos representa un DataGridView
+                        }
+                        writer.WriteLine(configurations[i]);
                     }
                     writer.Close();
                 }
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("ManagerControls", "setGridConfiguration", ex);
+                ManagerExceptions.writeToLog("DataGridConfiguration", "setGridConfiguration", ex);
             }
         }
 
-        public static void getGridConfiguration(DataGridView dataGrd)
+        /// <summary>
+        /// Revisa si existe el grid en los guardados previamente para obtener su configuracion
+        /// </summary>
+        /// <param name="dataGrd"></param>
+        public static void UpdateConfiguration(DataGridView dataGrd)
         {
             try
             {
@@ -55,57 +69,80 @@ namespace AZO_Library.ControlUtilitys
                 {
                     if (!File.Exists(dataGridConfigurationPath))
                     {
+                        //Capturo el Stream para poder cerrar el archivo creado y no genere errores
                         StreamWriter writer = File.CreateText(dataGridConfigurationPath);
                         writer.Close();
-                        dataGridConfiguration = new ArrayList();
+
+                        configurations = new ArrayList();
+                        grdsName = new ArrayList();
+
+                        grdsName.Add(dataGrd.Name);
                     }
                     else
                     {
                         StreamReader objReader = new StreamReader(dataGridConfigurationPath);
+                        configurations = new ArrayList();
+                        grdsName = new ArrayList();
                         string strLinea = objReader.ReadLine();
-                        ArrayList arrText = new ArrayList();
 
                         while (strLinea != null)
                         {
-                            arrText.Add(strLinea);
+                            configurations.Add(strLinea);
+                            //agregamos el nombre de los grids ya almacenados
+                            grdsName.Add(strLinea.ToString().Split(';')[0]);
                             strLinea = objReader.ReadLine();
                         }
-                        dataGridConfiguration = arrText;
 
                         objReader.Close();
                         objReader.Dispose();
 
-                        for (int i = 0; i < grdsName.Length; i++)
+                        if (configurations.Count != 0)
                         {
-                            if (dataGrd.Name.Equals(grdsName[i]))
+                            for (int i = 0; i < grdsName.Count; i++)
                             {
-                                insertConfigurationInGrid(dataGrd,
-                                    (dataGridConfiguration.Count != 0) ? dataGridConfiguration[i].ToString().Split(',') : null);
-                                break;
+                                String auxConfiguration = configurations[i].ToString().Split(';')[1];
+                                if (dataGrd.Name.Equals(grdsName[i]))
+                                {
+                                    UpdateConfiguration(dataGrd, auxConfiguration.Split(','));
+                                    break;
+                                }
                             }
+                        }
+                        else
+                        {
+                            grdsName.Add(dataGrd.Name);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("ManagerControls", "getGridConfiguration", ex);
+                ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
             }
         }
 
-        private static void insertConfigurationInGrid(DataGridView dataGrd, String[] configuration)
+        /// <summary>
+        /// Actualiza el tamaño de las columnas del grid
+        /// </summary>
+        /// <param name="dataGrd"></param>
+        /// <param name="configuration"></param>
+        private static void UpdateConfiguration(DataGridView dataGrd, String[] configuration)
         {
             try
             {
                 if (configuration != null && configuration.Length != 1)
-                    for (int i = 0; i < dataGrd.ColumnCount; i++)
+                {
+                    int x = 0;
+                    while (x < dataGrd.ColumnCount && x < configuration.Length)
                     {
-                        dataGrd.Columns[i].Width = int.Parse(configuration[i]);
+                        dataGrd.Columns[x].Width = int.Parse(configuration[x]);
+                        x++;
                     }
+                }
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("ManagerControls", "insertConfigurationInGrid", ex);
+                ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
             }
         }
     }

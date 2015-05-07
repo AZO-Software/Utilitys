@@ -125,7 +125,7 @@ namespace AZO_Library
             }
         }
 
-        public void BeginTransaction()
+        protected void BeginTransaction()
         {
             try
             {
@@ -140,7 +140,7 @@ namespace AZO_Library
             }
         }
 
-        public void EndTransaction()
+        protected void EndTransaction()
         {
             try
             {

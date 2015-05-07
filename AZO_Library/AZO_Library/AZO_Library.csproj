@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlUtilitys\DataGridConfiguration.cs" />
+    <Compile Include="ControlUtilitys\ManagerControls.cs" />
     <Compile Include="ControlUtilitys\ManagerExceptions.cs" />
     <Compile Include="ControlUtilitys\PrintReport.cs" />
     <Compile Include="ControlUtilitys\Validate.cs" />
