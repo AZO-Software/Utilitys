@@ -26,6 +26,24 @@ namespace AZO_Library
             command.Connection = connection;
         }
 
+        protected bool AddQuery(String query)
+        {
+            try
+            {
+                if (connection.State == ConnectionState.Open)
+                    connection.Close();
+                connection.Open();
+
+                command.CommandType = System.Data.CommandType.Text;
+                command.CommandText = query;
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                return false;
+            }
+        }
+
         protected bool AddStoredProcedure(String storedProcedure)
         {
             try
@@ -123,6 +141,23 @@ namespace AZO_Library
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// El campo del valor de retorno siempre debe llamarse returnValue
+        /// </summary>
+        /// <returns></returns>
+        protected object ExecuteAndGetReturnValue()
+        {
+            object returnValue = null;
+            SqlDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                returnValue = reader["returValue"];
+            }
+            reader.Close();
+
+            return returnValue;
         }
 
         protected void BeginTransaction()

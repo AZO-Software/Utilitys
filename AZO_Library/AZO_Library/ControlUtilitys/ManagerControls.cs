@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace AZO_Library.ControlUtilitys
 {
-    class ManagerControls
+    public class ManagerControls
     {
         /// <summary>
         /// Llena un combobox con la informacion de la tabla proporcionada
