@@ -53,7 +53,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("DataGridConfiguration", "setGridConfiguration", ex);
+                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "setGridConfiguration", ex);
             }
         }
 
@@ -117,7 +117,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
+                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
             }
         }
 
@@ -142,7 +142,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
+                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration", ex);
             }
         }
     }

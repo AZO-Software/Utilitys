@@ -51,7 +51,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                ManagerExceptions.writeToLog("ManagerControls", "fillCbxWithTable", ex);
+                Tools.ManagerExceptions.writeToLog("ManagerControls", "fillCbxWithTable", ex);
             }
         }
 

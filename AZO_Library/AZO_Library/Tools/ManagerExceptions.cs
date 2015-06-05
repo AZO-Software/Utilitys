@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace AZO_Library.ControlUtilitys
+namespace AZO_Library.Tools
 {
     public class ManagerExceptions //: IObservable<ManagerExceptions>
     {

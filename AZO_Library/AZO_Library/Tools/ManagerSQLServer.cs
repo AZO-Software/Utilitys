@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 
-namespace AZO_Library
+namespace AZO_Library.Tools
 {
     public class ManagerSQLServer
     {
@@ -34,6 +34,7 @@ namespace AZO_Library
                     connection.Close();
                 connection.Open();
 
+                command.Parameters.Clear();
                 command.CommandType = System.Data.CommandType.Text;
                 command.CommandText = query;
                 return true;
@@ -52,6 +53,7 @@ namespace AZO_Library
                     connection.Close();
                 connection.Open();
 
+                command.Parameters.Clear();
                 command.CommandType = System.Data.CommandType.StoredProcedure;
                 command.CommandText = storedProcedure;
                 return true;
@@ -153,7 +155,7 @@ namespace AZO_Library
             SqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                returnValue = reader["returValue"];
+                returnValue = reader["returnValue"];
             }
             reader.Close();
 
@@ -188,30 +190,6 @@ namespace AZO_Library
                 beginTransaction = false;
             }
         }
-
-        //public Dictionary<string, string> ExecuteQuery()
-        //{
-        //    try
-        //    {
-        //        return GenDictionary(command.ExecuteReader());
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-        //}
-
-        //public DataTable ExecuteQuery()
-        //{
-        //    try
-        //    {
-        //        return GetTable();
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-        //}
 
         private Dictionary<string, string> GenDictionary(SqlDataReader reader)
         {
