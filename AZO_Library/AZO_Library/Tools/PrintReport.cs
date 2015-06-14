@@ -9,26 +9,54 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AZO_Library.ControlUtilitys
+namespace AZO_Library.Tools
 {
     public class PrintReport
     {
         private int m_currentPageIndex;
         private IList<Stream> m_streams;
 
-        public PrintReport(int idNote, System.Data.DataTable table, string reportName)
+        /// <summary>
+        /// Mandar imprimir el reporte a la impresora que este por default, agregando el valor recibido como parametro
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <param name="parameterValue"></param>
+        /// <param name="table"></param>
+        /// <param name="reportName"></param>
+        public PrintReport(string parameterName, string parameterValue, System.Data.DataTable table, string reportName)
         {
             try
             {
                 LocalReport report = new LocalReport();
                 report.ReportEmbeddedResource = reportName;
                 report.DataSources.Add(new ReportDataSource("DataSet1", table));
-                ReportParameter parameterFolio = new ReportParameter("Folio", idNote.ToString());
+                ReportParameter parameterFolio = new ReportParameter(parameterName, parameterValue);
                 report.SetParameters(parameterFolio);
                 Export(report);
                 Print();
             }
             catch(Exception ex)
+            {
+                //ManagerExceptions.writeToLog("PrintSalesNotes", "PrintSalesNotes", ex);
+            }
+        }
+
+        /// <summary>
+        /// Manda imprimir el reporte, tomando en cuenta la tabla
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="reportName"></param>
+        public PrintReport(System.Data.DataTable table, string reportName)
+        {
+            try
+            {
+                LocalReport report = new LocalReport();
+                report.ReportEmbeddedResource = reportName;
+                report.DataSources.Add(new ReportDataSource("DataSet1", table));
+                Export(report);
+                Print();
+            }
+            catch (Exception ex)
             {
                 //ManagerExceptions.writeToLog("PrintSalesNotes", "PrintSalesNotes", ex);
             }
@@ -53,7 +81,9 @@ namespace AZO_Library.ControlUtilitys
                 m_streams = new List<Stream>();
                 report.Render("Image", deviceInfo, CreateStream, out warnings);
                 foreach (Stream stream in m_streams)
+                {
                     stream.Position = 0;
+                }
             }
             catch (Exception ex)
             {
@@ -69,6 +99,7 @@ namespace AZO_Library.ControlUtilitys
             {
                 Stream stream = new MemoryStream();
                 m_streams.Add(stream);
+
                 return stream;
             }
             catch (Exception ex)
@@ -83,7 +114,9 @@ namespace AZO_Library.ControlUtilitys
             try
             {
                 if (m_streams == null || m_streams.Count == 0)
+                {
                     throw new Exception("Error: no stream to print.");
+                }
                 PrintDocument printDoc = new PrintDocument();//este objeto permite obtener la impresora que realizara la impresion
 
                 if (!printDoc.PrinterSettings.IsValid)

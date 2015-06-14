@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace AZO_Library.Tools
 {
-    class Words
+    public class Words
     {
+        #region Constantes
+
+        private static string CLAVE = "A0Y r3b1c y @1r3l3p@p";
+
+        #endregion
+
         /// <summary>
         /// Encripta la palabra especificada, este metodo de encriptacion no se puede desencriptar
         /// </summary>
@@ -21,7 +27,7 @@ namespace AZO_Library.Tools
         }
 
         /// <summary>
-        /// Desencripta una cadena encriptada por el metodo de encriptacion "AES"
+        /// Desencripta una cadena previamente encriptada por el metodo de encriptacion "AES"
         /// </summary>
         /// <param name="dataDecrypt"></param>
         /// <returns></returns>
@@ -38,7 +44,7 @@ namespace AZO_Library.Tools
                 {
                     ALG.KeySize = 128;
                     ALG.BlockSize = 128;
-                    ALG.Key = codificador.GetBytes(ReverseString("A0Y r3b1c y @1r3l3p@p".PadRight(32, '0')));
+                    ALG.Key = codificador.GetBytes(ReverseString(CLAVE.PadRight(32, '0')));
 
                     using (var cryptoProvider = new SHA1CryptoServiceProvider())
                     {
@@ -58,8 +64,9 @@ namespace AZO_Library.Tools
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                Tools.ManagerExceptions.writeToLog("Words", "DecryptAES", ex);
                 return null;
             }
         }

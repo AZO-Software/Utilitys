@@ -46,7 +46,7 @@
     <Compile Include="ControlUtilitys\DataGridConfiguration.cs" />
     <Compile Include="ControlUtilitys\ManagerControls.cs" />
     <Compile Include="Tools\ManagerExceptions.cs" />
-    <Compile Include="ControlUtilitys\PrintReport.cs" />
+    <Compile Include="Tools\PrintReport.cs" />
     <Compile Include="ControlUtilitys\Validate.cs" />
     <Compile Include="Tools\ManagerSQLServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -14,6 +14,7 @@ namespace AZO_Library.Tools
         private SqlCommand command;
         private SqlDataAdapter adapter;
         private SqlTransaction transaction;
+        //esta variable indica si hay una transaccion en curso o no
         private bool beginTransaction;
 
         //stringConexion = System.Configuration.ConfigurationManager.ConnectionStrings["sqlServer"].ConnectionString;
@@ -30,9 +31,15 @@ namespace AZO_Library.Tools
         {
             try
             {
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
-                connection.Open();
+                //este if evita que se cierre la transaccion en curso(cuando hay)
+                if (!beginTransaction)
+                {
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
+                    connection.Open();
+                }
 
                 command.Parameters.Clear();
                 command.CommandType = System.Data.CommandType.Text;
@@ -41,6 +48,7 @@ namespace AZO_Library.Tools
             }
             catch (SqlException ex)
             {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "AddQuery(String)", ex);
                 return false;
             }
         }
@@ -49,9 +57,14 @@ namespace AZO_Library.Tools
         {
             try
             {
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
-                connection.Open();
+                if (!beginTransaction)
+                {
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
+                    connection.Open();
+                }
 
                 command.Parameters.Clear();
                 command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -60,6 +73,7 @@ namespace AZO_Library.Tools
             }
             catch (SqlException ex)
             {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "AddStoredProcedure(String)", ex);
                 return false;
             }
         }
@@ -81,13 +95,14 @@ namespace AZO_Library.Tools
 
                 return command.ExecuteNonQuery();
             }
-            catch(Exception)
+            catch(Exception ex)
             {
                 if(beginTransaction)
                 {
                     beginTransaction = false;
                     transaction.Rollback();
                 }
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "ExecuteQuery(bool)", ex);
                 return -1;
             }
         }
@@ -104,13 +119,14 @@ namespace AZO_Library.Tools
 
                 return command.ExecuteReader();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (beginTransaction)
                 {
                     beginTransaction = false;
                     transaction.Rollback();
                 }
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetReader(bool)", ex);
                 return null;
             }
         }
@@ -119,28 +135,49 @@ namespace AZO_Library.Tools
         {
             try
             {
-                DataSet ds = new DataSet();
-                adapter = new SqlDataAdapter(command);
-                adapter.Fill(ds, "VALSEC");
-                return ds.Tables[0];
+                if (connection.State == ConnectionState.Open)
+                {
+                    DataSet ds = new DataSet();
+                    adapter = new SqlDataAdapter(command);
+                    adapter.Fill(ds, "VALSEC");
+                    return ds.Tables[0];
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetTable", ex);
                 return null;
             }
         }
 
+        /// <summary>
+        /// Regresa una tabla en especifico de las obtenidas de la consulta
+        /// </summary>
+        /// <param name="tableNumber"></param>
+        /// <returns></returns>
         protected DataTable GetTable(byte tableNumber)
         {
             try
             {
-                DataSet ds = new DataSet();
-                adapter = new SqlDataAdapter(command);
-                adapter.Fill(ds, "VALSEC");
-                return ds.Tables[tableNumber];
+                if (connection.State == ConnectionState.Open)
+                {
+                    DataSet ds = new DataSet();
+                    adapter = new SqlDataAdapter(command);
+                    adapter.Fill(ds, "VALSEC");
+                    return ds.Tables[tableNumber];
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetTable(byte)", ex);
                 return null;
             }
         }
@@ -151,15 +188,23 @@ namespace AZO_Library.Tools
         /// <returns></returns>
         protected object ExecuteAndGetReturnValue()
         {
-            object returnValue = null;
-            SqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                returnValue = reader["returnValue"];
-            }
-            reader.Close();
+                object returnValue = null;
 
-            return returnValue;
+                SqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    returnValue = reader["returnValue"];
+                }
+                reader.Close();
+                return returnValue;
+            }
+            catch(Exception ex)
+            {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "ExecuteAndGetReturnValue", ex);
+                return null;
+            }
         }
 
         protected void BeginTransaction()
@@ -170,10 +215,11 @@ namespace AZO_Library.Tools
                 command.Transaction = transaction;
                 beginTransaction = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 command.Transaction = null;
                 beginTransaction = false;
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "BeginTransaction", ex);
             }
         }
 
@@ -182,13 +228,13 @@ namespace AZO_Library.Tools
             try
             {
                 transaction.Commit();
-                beginTransaction = false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 transaction.Rollback();
-                beginTransaction = false;
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "EndTransaction", ex);
             }
+            beginTransaction = false;
         }
 
         private Dictionary<string, string> GenDictionary(SqlDataReader reader)
@@ -200,13 +246,16 @@ namespace AZO_Library.Tools
                 {
                     dictionary = new Dictionary<string, string>();
                     for (int i = 0; i < reader.FieldCount; i++)
+                    {
                         dictionary[reader.GetName(i)] = reader[i].ToString();
+                    }
                 }
                 reader.Close();
                 return dictionary;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GenDictionary(SqlDataReader)", ex);
                 return null;
             }
         }

@@ -51,7 +51,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerControls", "fillCbxWithTable", ex);
+                Tools.ManagerExceptions.writeToLog("ManagerControls", "FillCbxWithTable", ex);
             }
         }
 
@@ -62,20 +62,28 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="dataTable"></param>
         /// <param name="displayMember"></param>
         /// <param name="valueMember"></param>
-        public static void FillLtbxWithOffers(ListBox ltbxAux, DataTable dataTable, string displayMember, string valueMember)
+        public static void FillLtbxWithTable(ListBox ltbxAux, DataTable dataTable, string displayMember, string valueMember)
         {
-            ltbxAux.BeginUpdate();
-
-            if (ltbxAux.Items.Count > 0)
+            try
             {
-                ltbxAux.DataSource = null;
+                ltbxAux.BeginUpdate();
+
+                //vacia la lista si esta ya tenia valores
+                if (ltbxAux.Items.Count > 0)
+                {
+                    ltbxAux.DataSource = null;
+                }
+
+                ltbxAux.DisplayMember = displayMember;
+                ltbxAux.ValueMember = valueMember;
+                ltbxAux.DataSource = dataTable;
+
+                ltbxAux.EndUpdate();
             }
-
-            ltbxAux.DisplayMember = displayMember;
-            ltbxAux.ValueMember = valueMember;
-            ltbxAux.DataSource = dataTable;
-
-            ltbxAux.EndUpdate();
+            catch (Exception ex)
+            {
+                Tools.ManagerExceptions.writeToLog("ManagerControls", "FillLtbxWithTable", ex);
+            }
         }
     }
 }
