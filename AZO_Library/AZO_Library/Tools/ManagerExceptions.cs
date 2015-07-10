@@ -18,7 +18,7 @@ namespace AZO_Library.Tools
         /// la excepsion en el archivo Log
         /// </summary>
         /// <param name="message"></param>
-        public static void writeToLog(string message)
+        public static void WriteToLog(string message)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace AZO_Library.Tools
             }
         }
 
-        public static void writeToLog(Exception exception)
+        public static void WriteToLog(Exception exception)
         {
             try
             {
@@ -45,11 +45,11 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                writeToLog(ex.Message);
+                WriteToLog(ex.Message);
             }
         }
 
-        public static void writeToLog(string className, string methods, Exception exception)
+        public static void WriteToLog(string className, string methods, Exception exception)
         {
             try
             {
@@ -63,11 +63,11 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                writeToLog(ex.Message);
+                WriteToLog(ex.Message);
             }
         }
 
-        public static void writeToLog(string className, string methods, string exception)
+        public static void WriteToLog(string className, string methods, string exception)
         {
             try
             {
@@ -80,18 +80,20 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                writeToLog(ex.Message);
+                WriteToLog(ex.Message);
             }
         }
 
-        private static bool activeWarning(string exception)
+        private static bool ActiveWarning(string exception)
         {
             if (exception.Contains("Valor de Timeout caducado"))
             {
                 return false;
             }
             else
+            {
                 return true;
+            }
         }
 
         #endregion

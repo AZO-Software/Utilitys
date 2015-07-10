@@ -11,9 +11,9 @@ namespace AZO_Library.ControlUtilitys
 {
     public class DataGridConfiguration
     {
-        private static ArrayList configurations;
+        private static ArrayList configurations = new ArrayList();
         private static string dataGridConfigurationPath = "Configuration.txt";
-        public static ArrayList grdsName;
+        public static ArrayList grdsName = new ArrayList();
 
         /// <summary>
         /// Guarda el tamaño de las columnas de un grid en un archivo interno
@@ -53,7 +53,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "SetGridConfiguration(DataGridView)", ex);
+                Tools.ManagerExceptions.WriteToLog("DataGridConfiguration", "SetGridConfiguration(DataGridView)", ex);
             }
         }
 
@@ -81,15 +81,16 @@ namespace AZO_Library.ControlUtilitys
                     else
                     {
                         StreamReader objReader = new StreamReader(dataGridConfigurationPath);
-                        configurations = new ArrayList();
-                        grdsName = new ArrayList();
                         string strLinea = objReader.ReadLine();
 
                         while (strLinea != null)
                         {
-                            configurations.Add(strLinea);
-                            //agregamos el nombre de los grids ya almacenados
-                            grdsName.Add(strLinea.ToString().Split(';')[0]);
+                            if (!grdsName.Contains(strLinea.ToString().Split(';')[0]))
+                            {
+                                configurations.Add(strLinea);
+                                //agregamos el nombre de los grids ya almacenados
+                                grdsName.Add(strLinea.ToString().Split(';')[0]);
+                            }
                             strLinea = objReader.ReadLine();
                         }
 
@@ -104,20 +105,17 @@ namespace AZO_Library.ControlUtilitys
                                 if (dataGrd.Name.Equals(grdsName[i]))
                                 {
                                     UpdateConfiguration(dataGrd, auxConfiguration.Split(','));
-                                    break;
+                                    return;
                                 }
                             }
                         }
-                        else
-                        {
-                            grdsName.Add(dataGrd.Name);
-                        }
+                        grdsName.Add(dataGrd.Name);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration(DataGridView)", ex);
+                Tools.ManagerExceptions.WriteToLog("DataGridConfiguration", "UpdateConfiguration(DataGridView)", ex);
             }
         }
 
@@ -142,7 +140,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("DataGridConfiguration", "UpdateConfiguration(DataGridView, String[])", ex);
+                Tools.ManagerExceptions.WriteToLog("DataGridConfiguration", "UpdateConfiguration(DataGridView, String[])", ex);
             }
         }
     }

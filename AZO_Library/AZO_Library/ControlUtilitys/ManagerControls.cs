@@ -51,7 +51,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerControls", "FillCbxWithTable", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillCbxWithTable", ex);
             }
         }
 
@@ -82,7 +82,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerControls", "FillLtbxWithTable", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillLtbxWithTable", ex);
             }
         }
     }

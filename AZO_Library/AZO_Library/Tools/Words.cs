@@ -66,7 +66,7 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("Words", "DecryptAES", ex);
+                Tools.ManagerExceptions.WriteToLog("Words", "DecryptAES", ex);
                 return null;
             }
         }

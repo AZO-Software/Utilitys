@@ -48,7 +48,7 @@ namespace AZO_Library.Tools
             }
             catch (SqlException ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "AddQuery(String)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "AddQuery(String)", ex);
                 return false;
             }
         }
@@ -73,7 +73,7 @@ namespace AZO_Library.Tools
             }
             catch (SqlException ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "AddStoredProcedure(String)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "AddStoredProcedure(String)", ex);
                 return false;
             }
         }
@@ -83,13 +83,13 @@ namespace AZO_Library.Tools
             command.Parameters.AddWithValue(parameter, value);
         }
 
-        protected int ExecuteQuery(bool beginTransaction)
+        protected int ExecuteQuery(bool beginTransaction = false)
         {
             try
             {
-                this.beginTransaction = beginTransaction;
                 if(beginTransaction)
                 {
+                    this.beginTransaction = beginTransaction;
                     BeginTransaction();
                 }
 
@@ -102,12 +102,12 @@ namespace AZO_Library.Tools
                     beginTransaction = false;
                     transaction.Rollback();
                 }
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "ExecuteQuery(bool)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "ExecuteQuery(bool)", ex);
                 return -1;
             }
         }
 
-        protected SqlDataReader GetReader(bool beginTransaction)
+        protected SqlDataReader GetReader(bool beginTransaction = false)
         {
             try
             {
@@ -126,40 +126,41 @@ namespace AZO_Library.Tools
                     beginTransaction = false;
                     transaction.Rollback();
                 }
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetReader(bool)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "GetReader(bool)", ex);
                 return null;
             }
         }
 
-        protected DataTable GetTable()
-        {
-            try
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    DataSet ds = new DataSet();
-                    adapter = new SqlDataAdapter(command);
-                    adapter.Fill(ds, "VALSEC");
-                    return ds.Tables[0];
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetTable", ex);
-                return null;
-            }
-        }
+        //verificar k funciona con un solo metodo agregando un valor por default al parametro
+        //protected DataTable GetTable()
+        //{
+        //    try
+        //    {
+        //        if (connection.State == ConnectionState.Open)
+        //        {
+        //            DataSet ds = new DataSet();
+        //            adapter = new SqlDataAdapter(command);
+        //            adapter.Fill(ds, "VALSEC");
+        //            return ds.Tables[0];
+        //        }
+        //        else
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetTable", ex);
+        //        return null;
+        //    }
+        //}
 
         /// <summary>
         /// Regresa una tabla en especifico de las obtenidas de la consulta
         /// </summary>
         /// <param name="tableNumber"></param>
         /// <returns></returns>
-        protected DataTable GetTable(byte tableNumber)
+        protected DataTable GetTable(byte tableNumber = 0)
         {
             try
             {
@@ -177,7 +178,7 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GetTable(byte)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "GetTable(byte)", ex);
                 return null;
             }
         }
@@ -202,7 +203,12 @@ namespace AZO_Library.Tools
             }
             catch(Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "ExecuteAndGetReturnValue", ex);
+                if (beginTransaction)
+                {
+                    beginTransaction = false;
+                    transaction.Rollback();
+                }
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "ExecuteAndGetReturnValue", ex);
                 return null;
             }
         }
@@ -219,7 +225,7 @@ namespace AZO_Library.Tools
             {
                 command.Transaction = null;
                 beginTransaction = false;
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "BeginTransaction", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "BeginTransaction", ex);
             }
         }
 
@@ -232,7 +238,23 @@ namespace AZO_Library.Tools
             catch (Exception ex)
             {
                 transaction.Rollback();
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "EndTransaction", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "EndTransaction", ex);
+            }
+            beginTransaction = false;
+        }
+
+        protected void RollbackTransaction()
+        {
+            try
+            {
+                if (beginTransaction)
+                {
+                    transaction.Rollback();
+                }
+            }
+            catch(Exception ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "RollbackTransaction", ex);
             }
             beginTransaction = false;
         }
@@ -255,7 +277,7 @@ namespace AZO_Library.Tools
             }
             catch(Exception ex)
             {
-                Tools.ManagerExceptions.writeToLog("ManagerSQLServer", "GenDictionary(SqlDataReader)", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "GenDictionary(SqlDataReader)", ex);
                 return null;
             }
         }
