@@ -85,5 +85,34 @@ namespace AZO_Library.ControlUtilitys
                 Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillLtbxWithTable", ex);
             }
         }
+
+        /// <summary>
+        /// Actualiza el filtro actual del DataGridView especificado
+        /// </summary>
+        /// <param name="grid">Grid al que se aplicara el filtro</param>
+        /// <param name="filter">Filtro que se desea aplicar</param>
+        public static void UpdateGridFilter(DataGridView grid, string filter)
+        {
+            try
+            {
+                DataView dv = null;
+                //verifica si el datasource es una tabla, y si es asi la convierte a dataview sino solo hace un casting
+                if (grid.DataSource.GetType() == typeof(DataTable))
+                {
+                    dv = new DataView((DataTable)grid.DataSource);
+                }
+                else
+                {
+                    dv = (DataView)grid.DataSource;
+                }
+
+                dv.RowFilter = filter;
+                grid.DataSource = dv;
+            }
+            catch (Exception ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "UpdateFilter", ex);
+            }
+        }
     }
 }

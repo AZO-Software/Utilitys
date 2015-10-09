@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace AZO_Library.ControlUtilitys
 {
-    public class Validate
+    public class ValidateControlText
     {
         #region CONSTANTS
         
@@ -17,6 +17,7 @@ namespace AZO_Library.ControlUtilitys
         private const string REG_EXP_DOUBLE = "^\\d{0,4}(\\.[0-9]?[0-9]?)?$";
         private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s){0,3}$";
         private const string REG_EXP_PORCENT = "^\\d{1,3}(\\.[0-9]?[0-9]?)?$";
+        private const string REG_EXP_EMAIL = "^[_a-zA-Z0-9\\-]+(\\.[_a-zA-Z0-9\\-]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*(\\.[a-zA-Z]{2,3})$";
 
         #endregion
 
@@ -28,7 +29,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="txtToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsDigit(string textToValidate, KeyPressEventArgs e)
+        public static bool IsDigit(string textToValidate, KeyPressEventArgs e)
         {
             //se pone e.Handled = true para cancelar la ultima tecla presionada
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_DIGIT))
@@ -52,7 +53,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="textToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsDigit(string textToValidate, KeyEventArgs e)
+        public static bool IsDigit(string textToValidate, KeyEventArgs e)
         {
             //se pone e.Handled = true para cancelar la ultima tecla presionada
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate, REG_EXP_DIGIT))
@@ -76,7 +77,7 @@ namespace AZO_Library.ControlUtilitys
         /// </summary>
         /// <param name="textToValidate"></param>
         /// <returns></returns>
-        public bool IsDigit(string textToValidate)
+        public static bool IsDigit(string textToValidate)
         {
             return (System.Text.RegularExpressions.Regex.IsMatch(textToValidate, REG_EXP_DIGIT));
         }
@@ -87,7 +88,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="textToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsAlphanumeric(string textToValidate, KeyPressEventArgs e)
+        public static bool IsAlphanumeric(string textToValidate, KeyPressEventArgs e)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC))
             {
@@ -110,7 +111,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="textToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsAlphanumericWithWhitespice(string textToValidate, KeyPressEventArgs e)
+        public static bool IsAlphanumericWithWhitespice(string textToValidate, KeyPressEventArgs e)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC_WITH_WHITESPICE))
             {
@@ -133,7 +134,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="txtToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsDouble(TextBox txtToValidate, KeyPressEventArgs e)
+        public static bool IsDouble(TextBox txtToValidate, KeyPressEventArgs e)
         {
             //(String.IsNullOrWhiteSpace(txtToValidate.SelectedText) ? txtToValidate.Text : "") --> permite escribir cuando el texto esta seleccionado
             if (!System.Text.RegularExpressions.Regex.IsMatch(
@@ -159,7 +160,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="textToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsPorcent(string textToValidate, KeyPressEventArgs e)
+        public static bool IsPorcent(string textToValidate, KeyPressEventArgs e)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_PORCENT))
             {
@@ -186,7 +187,7 @@ namespace AZO_Library.ControlUtilitys
         /// <param name="textToValidate"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool IsCharacter(string textToValidate, KeyPressEventArgs e)
+        public static bool IsCharacter(string textToValidate, KeyPressEventArgs e)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_CHARACTER))
             {
@@ -201,6 +202,40 @@ namespace AZO_Library.ControlUtilitys
                 e.Handled = false;
             }
             return !e.Handled;
+        }
+
+        /// <summary>
+        /// Se valida que la cadena corresponda a un correo electronico
+        /// </summary>
+        /// <param name="textToValidate"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static bool IsEmail(string textToValidate, KeyPressEventArgs e)
+        {
+            if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_EMAIL))
+            {
+                if (e.KeyChar != Convert.ToChar(Keys.Back))
+                {
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                //se pone e.Handled = false para permitir que aparesca la ultima tecla presionada
+                e.Handled = false;
+            }
+            return !e.Handled;
+        }
+
+        /// <summary>
+        /// Se valida que la cadena corresponda a un correo electronico
+        /// </summary>
+        /// <param name="textToValidate"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static bool IsEmail(string textToValidate)
+        {
+            return (System.Text.RegularExpressions.Regex.IsMatch(textToValidate, REG_EXP_EMAIL));
         }
 
         #endregion
