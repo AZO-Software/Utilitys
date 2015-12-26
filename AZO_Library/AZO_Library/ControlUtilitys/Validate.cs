@@ -14,8 +14,8 @@ namespace AZO_Library.ControlUtilitys
         private const string REG_EXP_DIGIT = "^\\d*$";
         private const string REG_EXP_ALPHANUMERIC = "^[a-zñA-ZÑ0-9]*$";
         private const string REG_EXP_ALPHANUMERIC_WITH_WHITESPICE = "^([a-zñA-ZÑ0-9]*|[a-zñA-ZÑ0-9]+\\s)*$";
-        private const string REG_EXP_DOUBLE = "^\\d{0,4}(\\.[0-9]?[0-9]?)?$";
-        private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s){0,3}$";
+        private const string REG_EXP_DOUBLE = "^\\d*(\\.[0-9]?[0-9]?)?$";
+        private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s)*$";
         private const string REG_EXP_PORCENT = "^\\d{1,3}(\\.[0-9]?[0-9]?)?$";
         private const string REG_EXP_EMAIL = "^[_a-zA-Z0-9\\-]+(\\.[_a-zA-Z0-9\\-]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*(\\.[a-zA-Z]{2,3})$";
 

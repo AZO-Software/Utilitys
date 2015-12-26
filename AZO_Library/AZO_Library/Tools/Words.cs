@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AZO_Library.Tools
 {
+    /// <summary>
+    /// Operaciones que se realizan exclusivamente sobre cadenas de texto
+    /// </summary>
     public class Words
     {
         #region Constantes
@@ -20,7 +23,7 @@ namespace AZO_Library.Tools
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        public static String Encrypting(String word)
+        public static string Encrypting(String word)
         {
             byte[] b = System.Text.Encoding.Default.GetBytes(word);//esto es para encriptar, solo falta pasarlo a base decimal.
             return Convert.ToBase64String(b, 0, b.Length);//se convierte a String antes de hacer return

@@ -11,10 +11,19 @@ using System.Threading.Tasks;
 
 namespace AZO_Library.Tools
 {
+    /// <summary>
+    /// Clase encargada de imprimir un reporte con la informacion especificada
+    /// </summary>
     public class PrintReport
     {
-        private int m_currentPageIndex;
-        private IList<Stream> m_streams;
+        #region Globals
+
+        private static int m_currentPageIndex;
+        private static IList<Stream> m_streams;
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Mandar imprimir el reporte a la impresora que este por default, agregando el valor recibido como parametro
@@ -23,7 +32,7 @@ namespace AZO_Library.Tools
         /// <param name="parameterValue"></param>
         /// <param name="table"></param>
         /// <param name="reportName"></param>
-        public PrintReport(string parameterName, string parameterValue, System.Data.DataTable table, string reportName)
+        public static void Print(string parameterName, string parameterValue, System.Data.DataTable table, string reportName)
         {
             try
             {
@@ -37,7 +46,7 @@ namespace AZO_Library.Tools
             }
             catch(Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "PrintSalesNotes", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintSalesNotes(string, string, DataTable, string)", ex);
             }
         }
 
@@ -46,7 +55,7 @@ namespace AZO_Library.Tools
         /// </summary>
         /// <param name="table"></param>
         /// <param name="reportName"></param>
-        public PrintReport(System.Data.DataTable table, string reportName)
+        public static void Print(System.Data.DataTable table, string reportName)
         {
             try
             {
@@ -58,12 +67,19 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "PrintSalesNotes", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintSalesNotes(DataTable, string)", ex);
             }
         }
 
-        // Export the given report as an EMF (Enhanced Metafile) file.
-        private void Export(LocalReport report)
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Export the given report as an EMF (Enhanced Metafile) file.
+        /// </summary>
+        /// <param name="report"></param>
+        private static void Export(LocalReport report)
         {
             try
             {
@@ -87,13 +103,21 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "Export", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "Export(LocalReport)", ex);
             }
         }
 
-        // Routine to provide to the report renderer, in order to
-        //    save an image for each page of the report.
-        private Stream CreateStream(string name, string fileNameExtension, Encoding encoding, string mimeType, bool willSeek)
+        /// <summary>
+        /// Routine to provide to the report renderer, in order to
+        ///    save an image for each page of the report.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fileNameExtension"></param>
+        /// <param name="encoding"></param>
+        /// <param name="mimeType"></param>
+        /// <param name="willSeek"></param>
+        /// <returns></returns>
+        private static Stream CreateStream(string name, string fileNameExtension, Encoding encoding, string mimeType, bool willSeek)
         {
             try
             {
@@ -104,12 +128,15 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "CreateStream", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "CreateStream(string, string, Encoding, string, bool)", ex);
                 return null;
             }
         }
 
-        private void Print()
+        /// <summary>
+        /// Imprime el documento previamente generado
+        /// </summary>
+        private static void Print()
         {
             try
             {
@@ -132,12 +159,16 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "Print", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "Print()", ex);
             }
         }
 
-        // Handler for PrintPageEvents
-        private void PrintPage(object sender, PrintPageEventArgs ev)
+        /// <summary>
+        /// Handler for PrintPageEvents
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ev"></param>
+        private static void PrintPage(object sender, PrintPageEventArgs ev)
         {
             try
             {
@@ -162,8 +193,10 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                //ManagerExceptions.writeToLog("PrintSalesNotes", "PrintPage", ex);
+                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintPage(object, PrintPageEventArgs)", ex);
             }
         }
+
+        #endregion
     }
 }

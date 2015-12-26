@@ -19,6 +19,10 @@ namespace AZO_Library.Tools
 
         //stringConexion = System.Configuration.ConfigurationManager.ConnectionStrings["sqlServer"].ConnectionString;
 
+        /// <summary>
+        /// Especifica la localizacion de la base de datos sobre la que se trabajara
+        /// </summary>
+        /// <param name="strConnection"></param>
         protected void SetConnectionString(String strConnection)
         {
             this.connection.ConnectionString = strConnection;
@@ -27,6 +31,11 @@ namespace AZO_Library.Tools
             command.Connection = connection;
         }
 
+        /// <summary>
+        /// Recibe y prepara un query para llevar a cabo su ejecucion
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>True si se agrego el query correctamente y False si genero algun error</returns>
         protected bool AddQuery(String query)
         {
             try
@@ -53,6 +62,11 @@ namespace AZO_Library.Tools
             }
         }
 
+        /// <summary>
+        /// Recibe y prepara un store procedure para llevar a cabo su ejecucion
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <returns>True si se agrego el StoreProcedure correctamente y False si genero algun error</returns>
         protected bool AddStoredProcedure(String storedProcedure)
         {
             try
@@ -78,11 +92,21 @@ namespace AZO_Library.Tools
             }
         }
 
+        /// <summary>
+        /// Agrega un parametro y su valor al StoreProcedure previamente agregado
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="value"></param>
         protected void AddParameter(String parameter, Object value)
         {
             command.Parameters.AddWithValue(parameter, value);
         }
 
+        /// <summary>
+        /// Ejecuta la instruccion previamente ingresada y regresa la cantidad de filas afectadas
+        /// </summary>
+        /// <param name="beginTransaction"></param>
+        /// <returns>Devuelve la cantidad de filas afectadas o -1 en caso de algun error</returns>
         protected int ExecuteQuery(bool beginTransaction = false)
         {
             try
@@ -107,6 +131,11 @@ namespace AZO_Library.Tools
             }
         }
 
+        /// <summary>
+        /// Ejecuta la instruccion previamente ingresada y devuelve un objeto SqlDataReader con el resultado
+        /// </summary>
+        /// <param name="beginTransaction"></param>
+        /// <returns>Genera un objeto SqlDataReader con el resultado de la instruccion, null en caso error</returns>
         protected SqlDataReader GetReader(bool beginTransaction = false)
         {
             try
@@ -158,8 +187,8 @@ namespace AZO_Library.Tools
         /// <summary>
         /// Regresa una tabla en especifico de las obtenidas de la consulta
         /// </summary>
-        /// <param name="tableNumber"></param>
-        /// <returns></returns>
+        /// <param name="tableNumber">Tabla que se desea obtener</param>
+        /// <returns>Regresa la tabla especificada o null en caso haberse generado error o no haber obtenido resultado de la instruccion</returns>
         protected DataTable GetTable(byte tableNumber = 0)
         {
             try
@@ -184,9 +213,9 @@ namespace AZO_Library.Tools
         }
 
         /// <summary>
-        /// El campo del valor de retorno siempre debe llamarse returnValue
+        /// Ejecuta la instruccion previamente ingresada regresando un valor de retorno especificado
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Regresa un valor especificado en la instruccion, el valor de retorno siempre debe llamarse returnValue</returns>
         protected object ExecuteAndGetReturnValue()
         {
             try
@@ -213,6 +242,9 @@ namespace AZO_Library.Tools
             }
         }
 
+        /// <summary>
+        /// Indica el inicio de una transaccion
+        /// </summary>
         protected void BeginTransaction()
         {
             try
@@ -229,6 +261,9 @@ namespace AZO_Library.Tools
             }
         }
 
+        /// <summary>
+        /// Indica la finalizacion de la transaccion
+        /// </summary>
         protected void EndTransaction()
         {
             try
@@ -243,6 +278,9 @@ namespace AZO_Library.Tools
             beginTransaction = false;
         }
 
+        /// <summary>
+        /// Genera la cancelacion de la transaccion en curso
+        /// </summary>
         protected void RollbackTransaction()
         {
             try
@@ -259,6 +297,11 @@ namespace AZO_Library.Tools
             beginTransaction = false;
         }
 
+        /// <summary>
+        /// Genera un diccionario apartir del SqlDataReader recibido
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns>Regresa el diccionario generado con el SqlDataReader recibido y null en caso de error</returns>
         private Dictionary<string, string> GenDictionary(SqlDataReader reader)
         {
             try

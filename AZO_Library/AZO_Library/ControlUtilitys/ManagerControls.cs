@@ -114,5 +114,71 @@ namespace AZO_Library.ControlUtilitys
                 Tools.ManagerExceptions.WriteToLog("ManagerControls", "UpdateFilter", ex);
             }
         }
+
+        /// <summary>
+        /// Método que exporta a un fichero Excel el contenido de un DataGridView
+        /// </summary>
+        /// <param name="dgvInformation">DataGridView que contiene los datos a exportar</param>
+        /// <returns>True si se llevo a cabo la exportacion de manera satisfactoria,
+        /// False en caso de no haberse almacenado toda la informacion en el archivo .xls</returns>
+        public static bool ExportDataGridViewToExcelFile(DataGridView dgvInformation)
+        {
+            try
+            {
+                SaveFileDialog fichero = new SaveFileDialog();
+                fichero.Filter = "Excel (*.xls)|*.xls";
+                if (fichero.ShowDialog() == DialogResult.OK)
+                {
+                    //pones el cursor en espera
+                    Cursor.Current = Cursors.WaitCursor;
+
+                    Microsoft.Office.Interop.Excel.Application application;
+                    Microsoft.Office.Interop.Excel.Workbook workBook;
+                    Microsoft.Office.Interop.Excel.Worksheet workSheet;
+                    application = new Microsoft.Office.Interop.Excel.Application();
+                    workBook = application.Workbooks.Add();
+                    workSheet = (Microsoft.Office.Interop.Excel.Worksheet)workBook.Worksheets.get_Item(1);
+
+                    //Recorremos el DataGridView rellenando la hoja de trabajo
+                    for (int i = 0; i < dgvInformation.Rows.Count; i++)
+                    {
+                        int ignoredColumns = 0;//representa las columnas omitidas
+                        for (int j = 0; j < dgvInformation.Columns.Count; j++)
+                        {
+                            //Si no es visible la columna no la exporto
+                            if (!dgvInformation.Rows[i].Cells[j].Visible)
+                            {
+                                ignoredColumns++;
+                                continue;
+                            }
+
+                            //agrego el nombre de la columna en base al grid, esto cuando es la primer fila que se va a agregar
+                            if (i == 0)
+                            {
+                                workSheet.Cells[i + 1, j + 1 - ignoredColumns] = dgvInformation.Columns[j].HeaderText;
+                            }
+
+                            //exporto solo las columnas visibles
+                            workSheet.Cells[i + 2, j + 1 - ignoredColumns] = dgvInformation.Rows[i].Cells[j].Value.ToString();
+                        }
+                    }
+                    workBook.SaveAs(fichero.FileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal);
+                    workBook.Close(true);
+                    application.Quit();
+
+                    //regreso el cursor a su estado normal
+                    Cursor.Current = Cursors.Default;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                //regreso el cursor a su estado normal
+                Cursor.Current = Cursors.Default;
+                AZO_Library.Tools.ManagerExceptions.WriteToLog("ManagerControls", "ExportarDataGridViewExcel", ex);
+            }
+
+            return false;
+        }
     }
 }

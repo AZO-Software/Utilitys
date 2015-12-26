@@ -8,8 +8,12 @@ namespace AZO_Library.Tools
 {
     public class ManagerExceptions //: IObservable<ManagerExceptions>
     {
+        #region Constants
+
         //Archivo donde se registrara el historial de logs
         private const string LOG_FILE = "LogsFile.txt";
+
+        #endregion
 
         #region Write to File Log
 
