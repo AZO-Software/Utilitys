@@ -43,11 +43,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlUtilitys\DataBaseInstaller.cs" />
     <Compile Include="ControlUtilitys\DataGridConfiguration.cs" />
+    <Compile Include="ControlUtilitys\Forms\InputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlUtilitys\Forms\InputBox.Designer.cs">
+      <DependentUpon>InputBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="ControlUtilitys\ManagerControls.cs" />
+    <Compile Include="ControlUtilitys\Forms\frmProgressBar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlUtilitys\Forms\frmProgressBar.Designer.cs">
+      <DependentUpon>frmProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\ConvertAmount.cs" />
     <Compile Include="Tools\ManagerExceptions.cs" />
     <Compile Include="Tools\PrintReport.cs" />
-    <Compile Include="ControlUtilitys\Validate.cs" />
+    <Compile Include="ControlUtilitys\ValidateControlText.cs" />
     <Compile Include="Tools\ManagerSQLServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\Words.cs" />
@@ -80,6 +94,14 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ControlUtilitys\Forms\frmProgressBar.resx">
+      <DependentUpon>frmProgressBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlUtilitys\Forms\InputBox.resx">
+      <DependentUpon>InputBox.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

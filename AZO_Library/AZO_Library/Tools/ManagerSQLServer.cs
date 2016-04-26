@@ -10,12 +10,22 @@ namespace AZO_Library.Tools
 {
     public class ManagerSQLServer
     {
+        #region Properties
+
+        public static string PathDataBaseScript { get; set; }
+
+        #endregion
+
+        #region Globals
+
         private SqlConnection connection = new SqlConnection();
         private SqlCommand command;
         private SqlDataAdapter adapter;
         private SqlTransaction transaction;
         //esta variable indica si hay una transaccion en curso o no
         private bool beginTransaction;
+
+        #endregion
 
         //stringConexion = System.Configuration.ConfigurationManager.ConnectionStrings["sqlServer"].ConnectionString;
 
@@ -99,7 +109,16 @@ namespace AZO_Library.Tools
         /// <param name="value"></param>
         protected void AddParameter(String parameter, Object value)
         {
-            command.Parameters.AddWithValue(parameter, value);
+            if (command.Parameters.IndexOf(parameter) < 0)
+            {
+                //entra aqui cuando es un parametro que actualmente no existe en el command
+                command.Parameters.AddWithValue(parameter, value);
+            }
+            else
+            {
+                //entra aqui cuando ya existe un parametro con el mismo nombre dentro del command y actualiza el valor del parametro
+                command.Parameters[command.Parameters.IndexOf(parameter)].Value = value;
+            }
         }
 
         /// <summary>
@@ -185,7 +204,7 @@ namespace AZO_Library.Tools
         //}
 
         /// <summary>
-        /// Regresa una tabla en especifico de las obtenidas de la consulta
+        /// Regresa una tabla en especifico de las obtenidas por la consulta
         /// </summary>
         /// <param name="tableNumber">Tabla que se desea obtener</param>
         /// <returns>Regresa la tabla especificada o null en caso haberse generado error o no haber obtenido resultado de la instruccion</returns>
@@ -243,6 +262,30 @@ namespace AZO_Library.Tools
         }
 
         /// <summary>
+        /// Ejecuta la instruccion previamente ingresada, devolviendo el primer valor del resultado de dicha instruccion
+        /// </summary>
+        /// <returns></returns>
+        protected string ExecuteAndGetFirstValue()
+        {
+            try
+            {
+                string returnValue = command.ExecuteScalar().ToString();
+                
+                return returnValue;
+            }
+            catch (Exception ex)
+            {
+                if (beginTransaction)
+                {
+                    beginTransaction = false;
+                    transaction.Rollback();
+                }
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "ExecuteAndGetFirstValue()", ex);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Indica el inicio de una transaccion
         /// </summary>
         protected void BeginTransaction()
@@ -257,7 +300,7 @@ namespace AZO_Library.Tools
             {
                 command.Transaction = null;
                 beginTransaction = false;
-                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "BeginTransaction", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "BeginTransaction()", ex);
             }
         }
 
@@ -322,6 +365,69 @@ namespace AZO_Library.Tools
             {
                 Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "GenDictionary(SqlDataReader)", ex);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Inicia la instalacion de la base de datos de la cadena de conexion actual
+        /// </summary>
+        protected void InstallDataBase()
+        {
+            AZO_Library.ControlUtilitys.DataBaseInstaller installer = new ControlUtilitys.DataBaseInstaller(PathDataBaseScript, command.Connection.ConnectionString);
+            installer.Install();
+        }
+
+        /// <summary>
+        /// Verifica la existencia de la base de datos a la cual se desea ingresar en la cadena de conexion
+        /// </summary>
+        /// <returns></returns>
+        protected bool Exist()
+        {
+            try
+            {
+                string connectionString = command.Connection.ConnectionString;
+                string dataBaseName = string.Empty;
+
+                foreach (string nameAux in command.Connection.ConnectionString.Split(';'))
+                {
+                    if (nameAux.ToUpper().Contains("INITIAL CATALOG"))
+                    {
+                        dataBaseName = nameAux.Substring(nameAux.IndexOf('=') + 1);
+                        break;
+                    }
+                }
+
+                //AddQuery(
+                //    "SELECT COUNT(*) AS Tablas FROM INFORMATION_SCHEMA.TABLES " +
+                //    "WHERE TABLE_TYPE = 'BASE TABLE'");
+
+                command.Connection.ConnectionString = connectionString.Replace(dataBaseName, "master");
+
+                AddQuery(
+                    "IF DB_ID('" + dataBaseName.TrimStart().TrimEnd() + "') IS NOT NULL " +
+                    "SELECT 1 AS Exist " +
+                    "ELSE " +
+                    "SELECT 0 AS Exist");
+
+                bool sucessfull = (int.Parse(ExecuteAndGetFirstValue()) == 1);
+
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+
+                command.Connection.ConnectionString = connectionString;
+                return sucessfull;
+            }
+            catch(SqlException ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "Exist()", ex);
+                return false;
+            }
+            catch(Exception ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerSQLServer", "Exist()", ex);
+                return false;
             }
         }
     }

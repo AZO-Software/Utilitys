@@ -11,9 +11,13 @@ namespace AZO_Library.ControlUtilitys
 {
     public class DataGridConfiguration
     {
+        #region Globals
+
         private static ArrayList configurations = new ArrayList();
         private static string dataGridConfigurationPath = "Configuration.txt";
         public static ArrayList grdsName = new ArrayList();
+
+        #endregion
 
         /// <summary>
         /// Guarda el tamaño de las columnas de un grid en un archivo interno

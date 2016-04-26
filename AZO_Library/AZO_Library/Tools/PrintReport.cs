@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace AZO_Library.Tools
 {
     /// <summary>
-    /// Clase encargada de imprimir un reporte con la informacion especificada
+    /// Clase encargada de imprimir un reporte con la informacion especificada, sin mostrar vista previa
     /// </summary>
     public class PrintReport
     {
@@ -26,12 +26,33 @@ namespace AZO_Library.Tools
         #region Public Methods
 
         /// <summary>
+        /// Manda imprimir el reporte, tomando en cuenta la tabla
+        /// </summary>
+        /// <param name="table">Informacion que se imprimira en el reporte</param>
+        /// <param name="reportName">Nombre del reporte</param>
+        public static void Print(System.Data.DataTable table, string reportName)
+        {
+            try
+            {
+                LocalReport report = new LocalReport();
+                report.ReportEmbeddedResource = reportName;
+                report.DataSources.Add(new ReportDataSource("DataSet1", table));
+                Export(report);
+                Print();
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "PrintSalesNotes(DataTable, string)", ex);
+            }
+        }
+
+        /// <summary>
         /// Mandar imprimir el reporte a la impresora que este por default, agregando el valor recibido como parametro
         /// </summary>
         /// <param name="parameterName"></param>
         /// <param name="parameterValue"></param>
-        /// <param name="table"></param>
-        /// <param name="reportName"></param>
+        /// <param name="table">Informacion que se imprimira en el reporte</param>
+        /// <param name="reportName">Nombre del reporte</param>
         public static void Print(string parameterName, string parameterValue, System.Data.DataTable table, string reportName)
         {
             try
@@ -46,28 +67,97 @@ namespace AZO_Library.Tools
             }
             catch(Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintSalesNotes(string, string, DataTable, string)", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "PrintSalesNotes(string, string, DataTable, string)", ex);
             }
         }
 
         /// <summary>
-        /// Manda imprimir el reporte, tomando en cuenta la tabla
+        /// Genera la impresion del reporte especificado, tomando en cuenta los parametros recibidos
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="reportName"></param>
-        public static void Print(System.Data.DataTable table, string reportName)
+        /// <param name="parameters">parametros que espera recibir el reporte</param>
+        /// <param name="table">Informacion que se imprimira en el reporte</param>
+        /// <param name="reportName">Nombre del reporte</param>
+        public static void Print(Dictionary<string, string> parameters, System.Data.DataTable table, string reportName)
         {
             try
             {
                 LocalReport report = new LocalReport();
-                report.ReportEmbeddedResource = reportName;
+                //report.ReportEmbeddedResource = reportName;
+                report.ReportPath = reportName;
                 report.DataSources.Add(new ReportDataSource("DataSet1", table));
+
+                for (int i = 0; i < parameters.Count; i++ )
+                {
+                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
+                    report.SetParameters(parameter);
+                }
                 Export(report);
                 Print();
             }
             catch (Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintSalesNotes(DataTable, string)", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "PrintSalesNotes(string, string, DataTable, string)", ex);
+            }
+        }
+
+        /// <summary>
+        /// Genera la impresion del reporte especificado, tomando en cuenta los parametros especifidados y el ancho de la pagina especificado
+        /// </summary>
+        /// <param name="parameters">parametros que espera recibir el reporte</param>
+        /// <param name="table">Informacion que se imprimira en el reporte</param>
+        /// <param name="reportName">Nombre del reporte</param>
+        /// <param name="pageWidth">Se refiere al ancho(in) que tendra el reporte</param>
+        public static void Print(Dictionary<string, string> parameters, System.Data.DataTable table, string reportName, double pageWidth)
+        {
+            try
+            {
+                LocalReport report = new LocalReport();
+                //report.ReportEmbeddedResource = reportName;
+                report.ReportPath = reportName;
+                report.DataSources.Add(new ReportDataSource("DataSet1", table));
+
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
+                    report.SetParameters(parameter);
+                }
+                Export(report, pageWidth);
+                Print();
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "PrintSalesNotes(string, string, DataTable, string)", ex);
+            }
+        }
+
+        /// <summary>
+        /// Genera la impresion del reporte especificado, tomando en cuenta los parametros, el ancho de la pagina y la impresora especificada
+        /// </summary>
+        /// <param name="parameters">parametros que espera recibir el reporte</param>
+        /// <param name="table">Informacion que se imprimira en el reporte</param>
+        /// <param name="reportName">Nombre del reporte</param>
+        /// <param name="pageWidth">Se refiere al ancho(in) que tendra el reporte</param>
+        /// <param name="printerName">Impresora a la que se accedera para realizar la impresion</param>
+        public static void Print(Dictionary<string, string> parameters, System.Data.DataTable table, string reportName, double pageWidth, string printerName)
+        {
+            try
+            {
+                LocalReport report = new LocalReport();
+                //report.ReportEmbeddedResource = reportName;
+                report.ReportPath = reportName;
+                report.DataSources.Add(new ReportDataSource("DataSet1", table));
+
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
+                    report.SetParameters(parameter);
+                }
+                Export(report, pageWidth);
+                Print(printerName);
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "Print(Dictionary<string, string>, DataTable, string, double, string)", ex);
             }
         }
 
@@ -103,7 +193,40 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "Export(LocalReport)", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "Export(LocalReport)", ex);
+            }
+        }
+
+        /// <summary>
+        /// Export the given report as an EMF (Enhanced Metafile) file.
+        /// </summary>
+        /// <param name="report"></param>
+        private static void Export(LocalReport report, double pageWidth)
+        {
+            try
+            {
+                string deviceInfo =
+                    string.Format(
+                        @"<DeviceInfo>
+                            <OutputFormat>EMF</OutputFormat>
+                            <PageWidth>{0}in</PageWidth>
+                            <PageHeight>11in</PageHeight>
+                            <MarginTop>0.25in</MarginTop>
+                            <MarginLeft>0.25in</MarginLeft>
+                            <MarginRight>0.25in</MarginRight>
+                            <MarginBottom>0.25in</MarginBottom>
+                        </DeviceInfo>", pageWidth);
+                Warning[] warnings;
+                m_streams = new List<Stream>();
+                report.Render("Image", deviceInfo, CreateStream, out warnings);
+                foreach (Stream stream in m_streams)
+                {
+                    stream.Position = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "Export(LocalReport, double)", ex);
             }
         }
 
@@ -128,13 +251,13 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "CreateStream(string, string, Encoding, string, bool)", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "CreateStream(string, string, Encoding, string, bool)", ex);
                 return null;
             }
         }
 
         /// <summary>
-        /// Imprime el documento previamente generado
+        /// Imprime el documento previamente generado, utilizando la impresora predeterminada del equipo
         /// </summary>
         private static void Print()
         {
@@ -159,7 +282,37 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "Print()", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "Print()", ex);
+            }
+        }
+
+        private static void Print(string printerName)
+        {
+            try
+            {
+                if (m_streams == null || m_streams.Count == 0)
+                {
+                    throw new Exception("Error: no stream to print.");
+                }
+                PrintDocument printDoc = new PrintDocument();//este objeto permite obtener la impresora que realizara la impresion
+                PrinterSettings printer = new PrinterSettings();
+                printer.PrinterName = printerName;
+                printDoc.PrinterSettings = printer;
+
+                if (!printDoc.PrinterSettings.IsValid)
+                {
+                    throw new Exception("Error: cannot find the default printer.");
+                }
+                else
+                {
+                    printDoc.PrintPage += new PrintPageEventHandler(PrintPage);
+                    m_currentPageIndex = 0;
+                    printDoc.Print();
+                }
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "Print(string)", ex);
             }
         }
 
@@ -193,7 +346,7 @@ namespace AZO_Library.Tools
             }
             catch (Exception ex)
             {
-                ManagerExceptions.WriteToLog("PrintSalesNotes", "PrintPage(object, PrintPageEventArgs)", ex);
+                ManagerExceptions.WriteToLog("PrintReport", "PrintPage(object, PrintPageEventArgs)", ex);
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace AZO_Library.ControlUtilitys
@@ -18,6 +19,7 @@ namespace AZO_Library.ControlUtilitys
         private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s)*$";
         private const string REG_EXP_PORCENT = "^\\d{1,3}(\\.[0-9]?[0-9]?)?$";
         private const string REG_EXP_EMAIL = "^[_a-zA-Z0-9\\-]+(\\.[_a-zA-Z0-9\\-]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*(\\.[a-zA-Z]{2,3})$";
+        private const int MAX_STRING_LENGTH = 9;
 
         #endregion
 
@@ -90,12 +92,15 @@ namespace AZO_Library.ControlUtilitys
         /// <returns></returns>
         public static bool IsAlphanumeric(string textToValidate, KeyPressEventArgs e)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC))
+            //valida si la cadena es mayor a la cantidad maxima para recortar los ultimos caracteres y continuar la validacion sobre estos
+            if (textToValidate.Length > MAX_STRING_LENGTH)
             {
-                if (e.KeyChar != Convert.ToChar(Keys.Back))
-                {
-                    e.Handled = true;
-                }
+                textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH);
+            }
+
+            if (e.KeyChar != Convert.ToChar(Keys.Back) && !System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC))
+            {
+                e.Handled = true;
             }
             else
             {
@@ -113,12 +118,24 @@ namespace AZO_Library.ControlUtilitys
         /// <returns></returns>
         public static bool IsAlphanumericWithWhitespice(string textToValidate, KeyPressEventArgs e)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC_WITH_WHITESPICE))
+            //valida si la cadena es mayor a la cantidad maxima para recortar los ultimos caracteres y continuar la validacion sobre estos
+            if (textToValidate.Length > MAX_STRING_LENGTH)
             {
-                if (e.KeyChar != Convert.ToChar(Keys.Back))
+                //este if evita que la cadena no cumple con la expresion por iniciar con ' ', despues de recortarla
+                if (textToValidate[textToValidate.Length - MAX_STRING_LENGTH] == ' ')
                 {
-                    e.Handled = true;
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH - 1);
                 }
+                else
+                {
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH);
+                }
+            }
+
+            //si no es la tecla de borrar y no cumple con la EXP_REG, entonces
+            if (e.KeyChar != Convert.ToChar(Keys.Back) && !Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC_WITH_WHITESPICE))
+            {
+                e.Handled = true;
             }
             else
             {
@@ -138,7 +155,7 @@ namespace AZO_Library.ControlUtilitys
         {
             //(String.IsNullOrWhiteSpace(txtToValidate.SelectedText) ? txtToValidate.Text : "") --> permite escribir cuando el texto esta seleccionado
             if (!System.Text.RegularExpressions.Regex.IsMatch(
-                (String.IsNullOrWhiteSpace(txtToValidate.SelectedText) ? txtToValidate.Text : "") + e.KeyChar,
+                (String.IsNullOrWhiteSpace(txtToValidate.SelectedText) ? txtToValidate.Text : string.Empty) + e.KeyChar,
                 REG_EXP_DOUBLE))
             {
                 if (e.KeyChar != Convert.ToChar(Keys.Back))
@@ -189,12 +206,23 @@ namespace AZO_Library.ControlUtilitys
         /// <returns></returns>
         public static bool IsCharacter(string textToValidate, KeyPressEventArgs e)
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_CHARACTER))
+            //valida si la cadena es mayor a la cantidad maxima para recortar los ultimos caracteres y continuar la validacion sobre estos
+            if (textToValidate.Length > MAX_STRING_LENGTH)
             {
-                if (e.KeyChar != Convert.ToChar(Keys.Back))
+                //este if evita que la cadena no cumple con la expresion por iniciar con ' ', despues de recortarla
+                if (textToValidate[textToValidate.Length - MAX_STRING_LENGTH] == ' ')
                 {
-                    e.Handled = true;
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH - 1);
                 }
+                else
+                {
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH);
+                }
+            }
+
+            if (e.KeyChar != Convert.ToChar(Keys.Back) && !System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_CHARACTER))
+            {
+                e.Handled = true;
             }
             else
             {

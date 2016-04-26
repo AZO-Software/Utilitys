@@ -56,7 +56,76 @@ namespace AZO_Library.ControlUtilitys
         }
 
         /// <summary>
-        /// Llena un listbox con la informacion contenida dentra la tabla especificada
+        /// Ingresa la informacion de la tabla proporcionada en un combobox
+        /// </summary>
+        /// <param name="cbxAux"></param>Combobox al que se le agregara la informacion
+        /// <param name="dataTable"></param>
+        /// <param name="displayMember"></param>Campo de la tabla que se mostrara dentro del combobox
+        /// <param name="valueMember"></param>
+        /// <param name="autoComplete"></param> especifica si tambien se agregara la parte del autocomplete al combobox
+        public static void FillCbxWithTable(ComboBox cbxAux, DataTable dataTable, string displayMember, string valueMember, string autoComplete = null)
+        {
+            try
+            {
+                cbxAux.BeginUpdate();
+
+                //vacia el combobox si este ya tenia valores
+                if (cbxAux.Items.Count > 0)
+                {
+                    cbxAux.DataSource = null;
+                }
+
+                //verifica si se debe muestrar el displey member o debe de aparecer vacio
+                if (!string.IsNullOrEmpty(displayMember))
+                {
+                    cbxAux.DisplayMember = displayMember;
+                    cbxAux.ValueMember = valueMember;
+                }
+                cbxAux.DataSource = dataTable;
+
+                //llena la parte del autocompletado si el usuario asi lo especifico
+                if (!string.IsNullOrEmpty(autoComplete))
+                {
+                    AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
+                    foreach (DataRow name in dataTable.Rows)
+                    {
+                        collection.Add(name[autoComplete].ToString());
+                    }
+                    cbxAux.AutoCompleteCustomSource = collection;
+                    cbxAux.AutoCompleteMode = AutoCompleteMode.Suggest;
+                    cbxAux.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                }
+
+                cbxAux.EndUpdate();
+            }
+            catch (Exception ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillCbxWithTable", ex);
+            }
+        }
+
+        public static void TextBoxAddAutoComplete(TextBox textBox, DataTable dataTable, string displayMember)
+        {
+            try
+            {
+                AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
+                foreach (DataRow name in dataTable.Rows)
+                {
+                    collection.Add(name[displayMember].ToString());
+                }
+
+                textBox.AutoCompleteCustomSource = collection;
+                textBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+                textBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            }
+            catch (Exception ex)
+            {
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "TextBoxAddAutoComplete(DataTable, string, string)", ex);
+            }
+        }
+
+        /// <summary>
+        /// Llena un listbox con la informacion contenida dentro de la tabla especificada
         /// </summary>
         /// <param name="ltbxAux"></param>
         /// <param name="dataTable"></param>
@@ -87,7 +156,7 @@ namespace AZO_Library.ControlUtilitys
         }
 
         /// <summary>
-        /// Actualiza el filtro actual del DataGridView especificado
+        /// Actualiza el filtro del DataGridView especificado
         /// </summary>
         /// <param name="grid">Grid al que se aplicara el filtro</param>
         /// <param name="filter">Filtro que se desea aplicar</param>
@@ -175,7 +244,7 @@ namespace AZO_Library.ControlUtilitys
             {
                 //regreso el cursor a su estado normal
                 Cursor.Current = Cursors.Default;
-                AZO_Library.Tools.ManagerExceptions.WriteToLog("ManagerControls", "ExportarDataGridViewExcel", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "ExportarDataGridViewExcel", ex);
             }
 
             return false;
