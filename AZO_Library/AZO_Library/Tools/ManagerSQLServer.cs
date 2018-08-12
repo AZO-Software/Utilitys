@@ -159,9 +159,10 @@ namespace AZO_Library.Tools
         {
             try
             {
-                this.beginTransaction = beginTransaction;
                 if (beginTransaction)
                 {
+                    //la meti al if para evitar que marque la transaccion como false cuando hay una transaccion iniciada
+                    this.beginTransaction = beginTransaction;
                     BeginTransaction();
                 }
 

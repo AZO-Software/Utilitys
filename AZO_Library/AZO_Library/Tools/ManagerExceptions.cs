@@ -25,7 +25,11 @@ namespace AZO_Library.Tools
         /// </summary>
         private static string DEFUALT_LOGS_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\LogsFolder\\";
 
+        private static Queue<string> Cache = new Queue<string>();
+
         #endregion
+
+        #region Constructor
 
         static ManagerExceptions()
         {
@@ -35,6 +39,10 @@ namespace AZO_Library.Tools
             }
         }
 
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// Edita la path del archivo que contiene la informacion de las excepciones
         /// </summary>
@@ -43,8 +51,6 @@ namespace AZO_Library.Tools
         {
             DEFUALT_LOGS_FOLDER = path;
         }
-
-        #region Write to File Log
 
         /// <summary>
         /// Guarda la informacion de la excepcion en el archivo LogsFile.txt
@@ -91,12 +97,17 @@ namespace AZO_Library.Tools
         {
             try
             {
+                //aqui se debe de obtener lo almacenado en cache
                 TextWriter tw = new StreamWriter(DEFUALT_LOGS_FOLDER + LOG_FILE, true);
+                //tw.WriteLine(
+                //    "->On (" + DateTime.Now.ToString() + "), Class:" + className + "; \nMethods: {\n" + methods + "}" +
+                //    "\nException {\n" + exception.InnerException + "}\n Description: [\n" + exception.Message + "] \n" + 
+                //    "**********************"
+                //    );
+
                 tw.WriteLine(
-                    "->On (" + DateTime.Now.ToString() + "), Class:" + className + "; \nMethods: {\n" + methods + "}" +
-                    "\nException {\n" + exception.InnerException + "}\n Description: [\n" + exception.Message + "] \n" + 
-                    "**********************"
-                    );
+                    string.Format("->On ({0}), Class:{1}; \nMethods: [\n{2}{3}]\nException: [\n{4}]\n Description: [\n{5}] \n**********************",
+                    DateTime.Now.ToString(), className, methods, GetCache(), exception.InnerException, exception.Message));
                 tw.Close();
             }
             catch (Exception ex)
@@ -132,6 +143,30 @@ namespace AZO_Library.Tools
             {
                 return true;
             }
+        }
+
+        public static void InsertCache(string value)
+        {
+            //verificamos que la cantidad de elementos no sobrepase los 10
+            if (Cache.Count > 10)
+            {
+                Cache.Dequeue();
+            }
+
+            Cache.Enqueue(value);
+        }
+
+        public static string GetCache()
+        {
+            string result = "(";
+
+            while(Cache.Count > 0)
+            {
+                result += string.Format("{0},", Cache.Dequeue());
+            }
+            result += ")";
+
+            return result;
         }
 
         #endregion

@@ -81,17 +81,7 @@ namespace AZO_Library.Tools
         {
             try
             {
-                LocalReport report = new LocalReport();
-                //report.ReportEmbeddedResource = reportName;
-                report.ReportPath = reportName;
-                report.DataSources.Add(new ReportDataSource("DataSet1", table));
-
-                for (int i = 0; i < parameters.Count; i++ )
-                {
-                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
-                    report.SetParameters(parameter);
-                }
-                Export(report);
+                Export(GenerateReport(parameters, table, reportName));
                 Print();
             }
             catch (Exception ex)
@@ -111,17 +101,7 @@ namespace AZO_Library.Tools
         {
             try
             {
-                LocalReport report = new LocalReport();
-                //report.ReportEmbeddedResource = reportName;
-                report.ReportPath = reportName;
-                report.DataSources.Add(new ReportDataSource("DataSet1", table));
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
-                    report.SetParameters(parameter);
-                }
-                Export(report, pageWidth);
+                Export(GenerateReport(parameters, table, reportName), pageWidth);
                 Print();
             }
             catch (Exception ex)
@@ -142,22 +122,33 @@ namespace AZO_Library.Tools
         {
             try
             {
-                LocalReport report = new LocalReport();
-                //report.ReportEmbeddedResource = reportName;
-                report.ReportPath = reportName;
-                report.DataSources.Add(new ReportDataSource("DataSet1", table));
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
-                    report.SetParameters(parameter);
-                }
-                Export(report, pageWidth);
+                Export(GenerateReport(parameters, table, reportName), pageWidth);
                 Print(printerName);
             }
             catch (Exception ex)
             {
                 ManagerExceptions.WriteToLog("PrintReport", "Print(Dictionary<string, string>, DataTable, string, double, string)", ex);
+            }
+        }
+
+        /// <summary>
+        /// Genera la impresion del reporte especificado, tomando en cuenta los parametros, el ancho de la pagina y la impresora especificada
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <param name="reportName"></param>
+        /// <param name="pageWidth"></param>
+        /// <param name="printerName"></param>
+        public static void Print(Dictionary<string, string> parameters, string reportName, double pageWidth, string printerName)
+        {
+            try
+            {
+                Export(GenerateReport(parameters, null, reportName), pageWidth);
+                Print(printerName);
+            }
+            catch (Exception ex)
+            {
+                ManagerExceptions.WriteToLog("PrintReport", "Print(Dictionary<string, string>, DataTable, string, double, string)", ex);
+                throw new Exception("Error: " + ex.Message);
             }
         }
 
@@ -313,6 +304,7 @@ namespace AZO_Library.Tools
             catch (Exception ex)
             {
                 ManagerExceptions.WriteToLog("PrintReport", "Print(string)", ex);
+                throw new Exception("Error: " + ex.Message);
             }
         }
 
@@ -348,6 +340,32 @@ namespace AZO_Library.Tools
             {
                 ManagerExceptions.WriteToLog("PrintReport", "PrintPage(object, PrintPageEventArgs)", ex);
             }
+        }
+
+        /// <summary>
+        /// Genera un reporte local apartir de la informacion recibida
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <param name="table"></param>
+        /// <param name="reportName"></param>
+        /// <returns></returns>
+        private static LocalReport GenerateReport(Dictionary<string, string> parameters, System.Data.DataTable table, string reportName)
+        {
+            LocalReport report = new LocalReport();
+            report.ReportPath = reportName;
+            if (table != null)
+            {
+                report.DataSources.Add(new ReportDataSource("DataSet1", table));
+            }
+
+            //agregamos todos los parametros al reporte de uno en uno
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                ReportParameter parameter = new ReportParameter(parameters.Keys.ElementAt(i), parameters.Values.ElementAt(i));
+                report.SetParameters(parameter);
+            }
+
+            return report;
         }
 
         #endregion

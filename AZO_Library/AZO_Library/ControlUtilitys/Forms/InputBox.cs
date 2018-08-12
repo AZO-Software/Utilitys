@@ -40,19 +40,7 @@ namespace AZO_Library.ControlUtilitys.Forms
 
         public static DialogResult ShowBox(string message, ref string inputText, int validate = 0)
         {
-            using (InputBox inputBox = new InputBox())
-            {
-                ValidationType = validate;
-
-                inputBox.Text = string.Empty;
-                inputBox.lblMessage.Text = message;
-                inputBox.txtInputText.Text = inputText;
-                inputBox.txtInputText.SelectAll();
-
-                DialogResult result = inputBox.ShowDialog();
-                inputText = inputBox.txtInputText.Text;
-                return result;
-            }
+            return ShowBox(string.Empty, message, ref inputText, validate);
         }
 
         public static DialogResult ShowBox(string headerText, string message, ref string inputText, int validate = 0)

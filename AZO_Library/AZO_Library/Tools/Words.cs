@@ -23,7 +23,7 @@ namespace AZO_Library.Tools
 
         #region Globals
 
-        private static ASCIIEncoding codificador = new ASCIIEncoding();
+        private static ASCIIEncoding encoding = new ASCIIEncoding();
 
         #endregion
 
@@ -34,10 +34,12 @@ namespace AZO_Library.Tools
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        public static string Encrypting(String word)
+        public static string EncryptDefault(String word)
         {
-            byte[] b = System.Text.Encoding.Default.GetBytes(word);//esto es para encriptar, solo falta pasarlo a base decimal.
-            return Convert.ToBase64String(b, 0, b.Length);//se convierte a String antes de hacer return
+            //esto es para encriptar, solo falta pasarlo a base decimal.
+            byte[] b = Encoding.Default.GetBytes(word);
+            //se convierte a String antes de hacer return
+            return Convert.ToBase64String(b, 0, b.Length);
         }
 
         /// <summary>
@@ -55,16 +57,19 @@ namespace AZO_Library.Tools
             }
             try
             {
+                //variable que contendra la informacion recien encriptada
                 byte[] encrypted;
+
                 using (AesManaged ALG = new AesManaged())
                 {
                     // Defaults
                     // CipherMode = CBC
                     // Padding = PKCS7
 
+                    //configuracion del AESManaged encargado de crear el objeto que encriptara la informacion
                     ALG.KeySize = 128;
                     ALG.BlockSize = 128;
-                    ALG.Key = codificador.GetBytes(ReverseString(Key.PadRight(32, '0')));
+                    ALG.Key = encoding.GetBytes(ReverseString(Key.PadRight(32, '0')));
 
                     using (var cryptoProvider = new SHA1CryptoServiceProvider())
                     {
@@ -77,12 +82,14 @@ namespace AZO_Library.Tools
                         ALG.IV = iv;
                     }
 
+                    //generamos el objeto que realizara la encriptacion final
                     ICryptoTransform encryptor = ALG.CreateEncryptor();
+                    //se realiza la encriptacion AES de los datos ingresados
                     encrypted = encryptor.TransformFinalBlock(data, 0, data.Length);
                 }
-                string result = Convert.ToBase64String(encrypted);
 
-                return result;
+                //convertimos el arreglo con la informacion encriptada a una cadena string
+                return Convert.ToBase64String(encrypted);
             }
             catch (Exception ex)
             {
@@ -103,6 +110,7 @@ namespace AZO_Library.Tools
 
             try
             {
+                //arreglo que contendra la informacion desencriptada
                 byte[] decrypted;
 
                 using (AesManaged ALG = new AesManaged())
@@ -125,13 +133,12 @@ namespace AZO_Library.Tools
                     ICryptoTransform decryptor = ALG.CreateDecryptor();
                     decrypted = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
                 }
-                string result = Encoding.UTF8.GetString(decrypted);
 
-                return result;
+                return Encoding.UTF8.GetString(decrypted);
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.WriteToLog("Words", "DecryptAES", ex);
+                Tools.ManagerExceptions.WriteToLog("Words", "DecryptAES(string)", ex);
                 return null;
             }
         }
@@ -146,6 +153,52 @@ namespace AZO_Library.Tools
             char[] arr = s.ToCharArray();
             Array.Reverse(arr);
             return new string(arr);
+        }
+
+        /// <summary>
+        /// Quita las vocales existentes en una cadena
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
+        public static string DeleteVowels(string word)
+        {
+            string[] vowels = { "A", "a", "E", "e", "I", "i", "O", "o", "U", "u"};
+
+            foreach (string vowel in vowels)
+            {
+                word = word.Replace(vowel, string.Empty);
+            }
+
+            return word;
+        }
+
+        /// <summary>
+        /// Genera un objeto AesManaged con la configuracion inicial ya establecida
+        /// </summary>
+        /// <returns></returns>
+        private static AesManaged CreateAesManaged()
+        {
+            using (AesManaged ALG = new AesManaged())
+            {
+
+                //configuracion del AESManaged encargado de crear el objeto que encriptara la informacion
+                ALG.KeySize = 128;
+                ALG.BlockSize = 128;
+                ALG.Key = encoding.GetBytes(ReverseString(Key.PadRight(32, '0')));
+
+                using (var cryptoProvider = new SHA1CryptoServiceProvider())
+                {
+                    byte[] aux = cryptoProvider.ComputeHash(ALG.Key);
+                    byte[] iv = new byte[16];
+                    for (int i = 0; i < iv.Length; i++)
+                    {
+                        iv[i] = aux[i];
+                    }
+                    ALG.IV = iv;
+                }
+
+                return ALG;
+            }
         }
 
         #endregion

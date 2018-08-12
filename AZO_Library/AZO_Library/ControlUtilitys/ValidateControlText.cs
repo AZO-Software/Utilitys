@@ -19,9 +19,10 @@ namespace AZO_Library.ControlUtilitys
         private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s)*$";
         private const string REG_EXP_PORCENT = "^\\d{1,3}(\\.[0-9]?[0-9]?)?$";
         private const string REG_EXP_EMAIL = "^[_a-zA-Z0-9\\-]+(\\.[_a-zA-Z0-9\\-]+)*@[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*(\\.[a-zA-Z]{2,3})$";
+        private const string REG_EXP_TELEPHONE_NUMBER = "^(\\d{1,3}|\\d{1,3}\\-)(\\d{1,3}|\\d{1,3}\\-)?(\\d{1,4})?$";
         private const int MAX_STRING_LENGTH = 9;
 
-        #endregion
+        #endregion CONSTANTS
 
         #region Validaciones
 
@@ -108,6 +109,16 @@ namespace AZO_Library.ControlUtilitys
                 e.Handled = false;
             }
             return !e.Handled;
+        }
+
+        /// <summary>
+        /// Se valida que la cadena sea un alfanumerico
+        /// </summary>
+        /// <param name="textToValidate"></param>
+        /// <returns></returns>
+        public static bool IsAlphanumeric(string textToValidate)
+        {
+            return (System.Text.RegularExpressions.Regex.IsMatch(textToValidate, REG_EXP_ALPHANUMERIC));
         }
 
         /// <summary>
@@ -264,6 +275,28 @@ namespace AZO_Library.ControlUtilitys
         public static bool IsEmail(string textToValidate)
         {
             return (System.Text.RegularExpressions.Regex.IsMatch(textToValidate, REG_EXP_EMAIL));
+        }
+
+        /// <summary>
+        /// Se valida que la cadena corresponda al formato para un numero de telefono
+        /// </summary>
+        /// <param name="textToValidate"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static bool IsTelephoneNumber(string textToValidate, KeyPressEventArgs e)
+        {
+            //se pone e.Handled = true para cancelar la ultima tecla presionada
+            if ((e.KeyChar != Convert.ToChar(Keys.Back)) && !System.Text.RegularExpressions.Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_TELEPHONE_NUMBER))
+            {
+                e.Handled = true;
+            }
+            else
+            {
+                //se pone e.Handled = false para permitir que aparesca la ultima tecla presionada
+                e.Handled = false;
+            }
+
+            return !e.Handled;
         }
 
         #endregion

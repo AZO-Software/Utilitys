@@ -51,6 +51,12 @@
     <Compile Include="ControlUtilitys\Forms\InputBox.Designer.cs">
       <DependentUpon>InputBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlUtilitys\Forms\SelectionOneRowBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlUtilitys\Forms\SelectionOneRowBox.Designer.cs">
+      <DependentUpon>SelectionOneRowBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="ControlUtilitys\ManagerControls.cs" />
     <Compile Include="ControlUtilitys\Forms\frmProgressBar.cs">
       <SubType>Form</SubType>
@@ -58,6 +64,7 @@
     <Compile Include="ControlUtilitys\Forms\frmProgressBar.Designer.cs">
       <DependentUpon>frmProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\ConsoleTools.cs" />
     <Compile Include="Tools\ConvertAmount.cs" />
     <Compile Include="Tools\ManagerExceptions.cs" />
     <Compile Include="Tools\PrintReport.cs" />
@@ -101,6 +108,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ControlUtilitys\Forms\InputBox.resx">
       <DependentUpon>InputBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlUtilitys\Forms\SelectionOneRowBox.resx">
+      <DependentUpon>SelectionOneRowBox.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

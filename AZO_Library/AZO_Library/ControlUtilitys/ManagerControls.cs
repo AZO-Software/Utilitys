@@ -10,6 +10,8 @@ namespace AZO_Library.ControlUtilitys
 {
     public class ManagerControls
     {
+        #region Methods
+
         /// <summary>
         /// Llena un combobox con la informacion de la tabla proporcionada
         /// </summary>
@@ -151,7 +153,7 @@ namespace AZO_Library.ControlUtilitys
             }
             catch (Exception ex)
             {
-                Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillLtbxWithTable", ex);
+                Tools.ManagerExceptions.WriteToLog("ManagerControls", "FillLtbxWithTable(ListBox, DataTable, string, string)", ex);
             }
         }
 
@@ -198,7 +200,7 @@ namespace AZO_Library.ControlUtilitys
                 fichero.Filter = "Excel (*.xls)|*.xls";
                 if (fichero.ShowDialog() == DialogResult.OK)
                 {
-                    //pones el cursor en espera
+                    //pones el cursor en espera del mouse
                     Cursor.Current = Cursors.WaitCursor;
 
                     Microsoft.Office.Interop.Excel.Application application;
@@ -249,5 +251,7 @@ namespace AZO_Library.ControlUtilitys
 
             return false;
         }
+
+        #endregion Methods
     }
 }
