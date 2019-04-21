@@ -130,7 +130,7 @@ namespace AZO_Library.Tools
         {
             try
             {
-                if(beginTransaction)
+                if (beginTransaction)
                 {
                     this.beginTransaction = beginTransaction;
                     BeginTransaction();
@@ -138,9 +138,14 @@ namespace AZO_Library.Tools
 
                 return command.ExecuteNonQuery();
             }
-            catch(Exception ex)
+            catch (SqlException sqlex)
             {
-                if(beginTransaction)
+                //esto pasa la excepcion original al autor de la llamada
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (beginTransaction)
                 {
                     beginTransaction = false;
                     transaction.Rollback();

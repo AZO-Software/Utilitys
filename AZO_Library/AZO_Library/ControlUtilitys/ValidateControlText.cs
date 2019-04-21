@@ -15,6 +15,7 @@ namespace AZO_Library.ControlUtilitys
         private const string REG_EXP_DIGIT = "^\\d*$";
         private const string REG_EXP_ALPHANUMERIC = "^[a-zñA-ZÑ0-9]*$";
         private const string REG_EXP_ALPHANUMERIC_WITH_WHITESPICE = "^([a-zñA-ZÑ0-9]*|[a-zñA-ZÑ0-9]+\\s)*$";
+        private const string REG_EXP_ALPHANUMERIC_WITH_WHITESPACE_AND_POINT = "^([a-zñA-ZÑ0-9]*|[a-zñA-ZÑ0-9]+(\\.?\\s?|\\s\\.))*$";
         private const string REG_EXP_DOUBLE = "^\\d*(\\.[0-9]?[0-9]?)?$";
         private const string REG_EXP_CHARACTER = "^([a-zñA-ZÑ]*|[a-zñA-ZÑ]+\\s)*$";
         private const string REG_EXP_PORCENT = "^\\d{1,3}(\\.[0-9]?[0-9]?)?$";
@@ -153,6 +154,42 @@ namespace AZO_Library.ControlUtilitys
                 //se pone e.Handled = false para permitir que aparesca la ultima tecla presionada
                 e.Handled = false;
             }
+            return !e.Handled;
+        }
+
+        /// <summary>
+        /// Se valida que el caracter ingresado en el TextBox sea un valor alfanumerico con puntos y no mas de un espacio en blanco a la vez
+        /// </summary>
+        /// <param name="textToValidate"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static bool IsAlphanumericWithWhitespiceAndPoint(string textToValidate, KeyPressEventArgs e)
+        {
+            //valida si la cadena es mayor a la cantidad maxima para recortar los ultimos caracteres y continuar la validacion sobre estos
+            if (textToValidate.Length > MAX_STRING_LENGTH)
+            {
+                //este if evita que la cadena no cumple con la expresion por iniciar con ' ', despues de recortarla
+                if (textToValidate[textToValidate.Length - MAX_STRING_LENGTH] == ' ')
+                {
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH - 1);
+                }
+                else
+                {
+                    textToValidate = textToValidate.Substring(textToValidate.Length - MAX_STRING_LENGTH);
+                }
+            }
+
+            //si no es la tecla de borrar y no cumple con la EXP_REG, entonces
+            if (e.KeyChar != Convert.ToChar(Keys.Back) && !Regex.IsMatch(textToValidate + e.KeyChar, REG_EXP_ALPHANUMERIC_WITH_WHITESPACE_AND_POINT))
+            {
+                e.Handled = true;
+            }
+            else
+            {
+                //se pone e.Handled = false para permitir que aparesca la ultima tecla presionada
+                e.Handled = false;
+            }
+
             return !e.Handled;
         }
 
