@@ -210,6 +210,10 @@ namespace AZO_Library.ControlUtilitys
                     workBook = application.Workbooks.Add();
                     workSheet = (Microsoft.Office.Interop.Excel.Worksheet)workBook.Worksheets.get_Item(1);
 
+                    //especificamos el formato que tendran las celdas del documento (formato de texto)
+                    Microsoft.Office.Interop.Excel.Range cells = workSheet.Cells;
+                    cells.NumberFormat = "@";
+
                     //Recorremos el DataGridView rellenando la hoja de trabajo
                     for (int i = 0; i < dgvInformation.Rows.Count; i++)
                     {
